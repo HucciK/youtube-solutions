@@ -1,0 +1,12 @@
+{
+  "server": {
+    "addr": ":8000"
+  },
+  "telegram": {
+    "token": "5678637087:AAH34YJMUi3NMf55gGTlV6cmZgJF4TzkXMo",
+    "host": "api.telegram.org",
+    "backend": "youtubesolutions.ru"
+  },
+  "downloadLink": "https://mega.nz/file/uAsjnCZR#cH3cMgW6WwyAEtAkuE5IY_1_h0P9ht5FbfQ49Jc7TWs",
+  "guideLink": "https://telegra.ph/YouTube-Solution-Guide-12-25"
+}

@@ -1,0 +1,20 @@
+{
+  "server": {
+    "addr": ":8000"
+  },
+  "db": {
+    "host": "127.0.0.1",
+    "port": 8081,
+    "user": "postgres",
+    "password": "12345",
+    "dbname": "dashboard",
+    "sslmode": "disable"
+  },
+  "orders": {
+    "max_free": 0,
+    "max_lifetime": 0,
+    "price": 600,
+    "renewal": 600
+  },
+  "version": "0.3.5"
+}

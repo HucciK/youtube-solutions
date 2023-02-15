@@ -1,0 +1,22 @@
+CREATE TABLE users (
+    id BIGINT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    balance FLOAT NOT NULL DEFAULT 0,
+    has_key BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE keys (
+    key TEXT NOT NULL UNIQUE,
+    type TEXT NOT NULL,
+    ip TEXT NOT NULL DEFAULT '',
+    expire TEXT NOT NULL,
+    is_expired BOOLEAN NOT NULL DEFAULT FALSE,
+    owner BIGINT NOT NULL UNIQUE
+);
+
+CREATE TABLE stats (
+    total_earnings BIGINT NOT NULL DEFAULT 0,
+    total_sold BIGINT NOT NULL DEFAULT 0,
+    period_sold INTEGER NOT NULL DEFAULT 0,
+    period_earnings INTEGER NOT NULL DEFAULT 0
+)

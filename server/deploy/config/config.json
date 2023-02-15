@@ -1,0 +1,19 @@
+{
+  "server": {
+    "addr": ":8000"
+  },
+  "db": {
+    "host": "postgres.c69330.h2",
+    "port": 5432,
+    "user": "c69330_youtubesolutions_ru",
+    "password": "RiZbaHazmuvuw75",
+    "dbname": "c69330_youtubesolutions_ru",
+    "sslmode": "disable"
+  },
+  "orders": {
+    "max_free": 0,
+    "max_lifetime": 0,
+    "price": 600,
+    "renewal": 600
+  }
+}
