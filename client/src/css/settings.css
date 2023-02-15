@@ -1,0 +1,70 @@
+#settings_content{
+    justify-content: flex-start;
+}
+
+.settings_list {
+    width: 200px;
+    height: 400px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-start;
+
+    margin-top: 25px;
+    margin-left: 50px;
+
+    border-radius: 15px;
+    box-shadow: 0px 0px 5px #e0e0e0;
+}
+
+.settings_list:first-of-type {
+    margin-top: 0px;
+}
+
+.settings_path_select_button {
+    background: none;
+    outline: none;
+    border: none;
+
+    transition: .3s;
+}
+
+.settings_path_select_button:hover{
+    color: var(--theme-color);
+    cursor: pointer;
+}
+
+.settings_container{
+    width: 200px;
+    height: 400px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-start;
+
+    margin-top: 25px;
+    margin-left: 50px;
+
+}
+
+.container_settings_list {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-start;
+
+    border-radius: 15px;
+    box-shadow: 0px 0px 5px #e0e0e0;
+}
+
+.container_settings_list:first-of-type {
+    margin-bottom: 25px;
+}

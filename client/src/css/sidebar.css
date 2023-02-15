@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600&display=swap');
+
+use {
+    pointer-events: none;
+}
+
+#sidebar {
+    width: 50px;
+    height: 500px;
+
+    margin-top: 50px;
+    margin-left: 50px;
+
+    background: var(--accent-color);
+    box-shadow: 0px 0px 10px var(--shadows-color);
+
+    border-radius: 15px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar_btn:nth-child(4) {
+    margin-top: auto;
+}
+
+.sidebar_btn{
+    width: 20px;
+    height: 20px;
+
+    margin-bottom: 25px;
+    cursor: pointer;
+
+    fill: var(--buttons-color);
+
+    transition: .5s;
+}
+
+.sidebar_btn:first-child{
+    margin-top: 35px;
+}
+
+.sidebar_btn:last-child{
+    margin-bottom: 35px;
+}
+
+.sidebar_btn:hover{
+    fill: var(--theme-color);
+}
+
+.sidebar_active {
+    fill: var(--theme-color);
+}
+
+#update {
+
+}
+
+#update:hover{
+    fill: var(--theme-color);
+    animation: update .7s linear;
+}
+
+#exit{
+    margin-left: 3px;
+}
+
+#exit:hover {
+    fill: #ff4545;
+}
+
+.disabled {
+    fill: #e0e0e0;
+}
+
+.disabled:hover{
+    fill: #e0e0e0;
+    cursor: default;
+}
+
+@keyframes update {
+    0% {
+        rotate: 0deg;
+    } 100% {
+        rotate: 360deg;
+    }
+}
