@@ -3,10 +3,13 @@ require("../scripts/settings")
 require("../scripts/checker")
 require("../scripts/proxy")
 
-let userPhotoEndpoint;
 const { ipcRenderer } = require("electron");
 const server = "http://youtubesolutions.ru"
 const authEndpoint = `${server}/api/authKey`
+
+let userPhotoEndpoint;
+
+let interfaceTheme = localStorage.getItem("user_theme")
 
 class Error {
     constructor(message) {
@@ -40,6 +43,8 @@ ipcRenderer.on("auth-success", async (e, data, version) => {
         ipcRenderer.send("exit-signal")
         return
     }
+
+    selectInterfaceTheme(interfaceTheme)
 
     document.querySelector("#license_info_news").innerText = `VERSION: ${version}`
 
@@ -137,6 +142,39 @@ async function doRequest(url) {
     return await response.json();
 }
 
+function selectInterfaceTheme(theme) {
+    let cssRoot = document.querySelector(":root")
+    if (theme === "dark_theme") {
+        cssRoot.style.setProperty("--theme-color", "#282833")
+        cssRoot.style.setProperty("--accent-color", "#020211")
+        cssRoot.style.setProperty("--default-text-color", "#e3e3e3")
+        cssRoot.style.setProperty("--accent-text-color", "white")
+        cssRoot.style.setProperty("--shadows-color", "dimgray")
+        cssRoot.style.setProperty("--buttons-color", "#e3e3e3")
+        cssRoot.style.setProperty("--disabled-buttons-color", "gray")
+
+        return
+    }
+
+    cssRoot.style.setProperty("--theme-color", "#a4a0ff")
+    cssRoot.style.setProperty("--accent-color", "white")
+    cssRoot.style.setProperty("--default-text-color", "#c2c2c2")
+    cssRoot.style.setProperty("--accent-text-color", "dimgray")
+    cssRoot.style.setProperty("--shadows-color", "#c2c2c2")
+    cssRoot.style.setProperty("--buttons-color", "dimgray")
+    cssRoot.style.setProperty("--disabled-buttons-color", "gray")
+
+
+}
+
 document.querySelector("#change_theme").addEventListener("click", () => {
-    document.querySelector(":root").style.setProperty("--theme-color", "red")
+    if (interfaceTheme == "dark_theme") {
+        interfaceTheme = "light_theme"
+    } else {
+        interfaceTheme = "dark_theme"
+    }
+
+    localStorage.setItem("user_theme", interfaceTheme)
+
+    selectInterfaceTheme(interfaceTheme)
 })

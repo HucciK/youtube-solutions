@@ -33,7 +33,7 @@ type Client struct {
 func NewClient(proxy *url.URL) *Client {
 	return &Client{
 		Client: &http.Client{
-			Timeout: 4 * time.Second,
+			Timeout: 2 * time.Second,
 
 			Transport: &http.Transport{
 				Proxy: http.ProxyURL(proxy),
@@ -51,6 +51,8 @@ func (c *Client) CheckCookies(cookies []*http.Cookie, cookieGeo, cookiesPath, co
 
 	data, err := c.startAuthProcess(cookies)
 	if err != nil {
+		upd := models.Update{Type: models.ErrorNotifyType, Err: err}
+		updatesChan <- upd
 		return
 	}
 

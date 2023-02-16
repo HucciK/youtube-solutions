@@ -35,7 +35,7 @@ func (p *ProxyChecker) SpeedTest(proxies []models.Proxy, updatesChan chan models
 			continue
 		}
 
-		ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*2000)
+		ctx, _ := context.WithTimeout(context.Background(), time.Millisecond*3000)
 
 		req, err := http.NewRequestWithContext(ctx, "GET", "https://youtube.com", nil)
 		if err != nil {

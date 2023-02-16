@@ -1,17 +1,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600&display=swap');
 
+
+/*
+
+dark theme
+:root{
+--theme-color: #282833;
+--accent-color: #32323f;
+--shadows-color: #3d3d4b;
+--default-color: white;
+}
+
+
+light theme
 :root{
   --theme-color: #a4a0ff;
   --accent-color: white;
-  --buttons-color: dimgrey;
+
+  --default-text-color: #c2c2c2;
+  --accent-text-color: dimgray;
+
   --shadows-color: #c2c2c2;
+
+  --buttons-color: dimgray;
+}
+
+*/
+
+
+:root{
+  --theme-color: #a4a0ff;
+  --accent-color: white;
+
+  --default-text-color: #c2c2c2;
+  --accent-text-color: dimgray;
+
+  --shadows-color: #c2c2c2;
+
+  --buttons-color: dimgray;
+  --disabled-buttons-color: gray;
 }
 
 * {
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 400;
-  color: var(--theme-color);
   user-select: none;
 }
 
