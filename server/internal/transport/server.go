@@ -2,7 +2,6 @@ package transport
 
 import (
 	"net/http"
-	"os"
 	"yt-solutions-server/config"
 )
 
@@ -12,12 +11,13 @@ type Server struct {
 
 func NewServer(cfg config.ServerConfig, h http.Handler) *Server {
 
-	APP_IP := os.Getenv("APP_IP")
-	APP_PORT := os.Getenv("APP_PORT")
+	//APP_IP := os.Getenv("APP_IP")
+	//APP_PORT := os.Getenv("APP_PORT")
 
 	return &Server{
 		Server: http.Server{
-			Addr:    APP_IP + ":" + APP_PORT,
+			//Addr:    APP_IP + ":" + APP_PORT,
+			Addr:    ":8080",
 			Handler: h,
 		},
 	}

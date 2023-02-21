@@ -46,7 +46,7 @@ ipcRenderer.on("auth-success", async (e, data, version) => {
 
     selectInterfaceTheme(interfaceTheme)
 
-    document.querySelector("#license_info_news").innerText = `VERSION: ${version}`
+    document.querySelector("#license_version_info").innerText = `VERSION: ${version}`
 
     let userPhotoEndpoint = `${server}/api/getUserPhoto?id=${data.key_info.owner}`
     let userInfoEndpoint = `${server}/api/getUserInfo?id=${data.key_info.owner}`
@@ -70,7 +70,23 @@ update.addEventListener("click",  () => {
 
 ipcRenderer.on("updates-checked", () => {
     update.style.animation = "none"
-    update.style.fill = "dimgrey"
+    update.style.fill = "var(--buttons-color)"
+})
+
+let changeLog = document.querySelector("#open_change_log")
+changeLog.addEventListener("click", openChangeLog)
+
+let changeTheme = document.querySelector("#change_theme");
+changeTheme.addEventListener("click", () => {
+    if (interfaceTheme == "dark") {
+        interfaceTheme = "light"
+    } else {
+        interfaceTheme = "dark"
+    }
+
+    localStorage.setItem("user_theme", interfaceTheme)
+
+    selectInterfaceTheme(interfaceTheme)
 })
 
 let content = document.querySelectorAll(".content_item")
@@ -144,13 +160,14 @@ async function doRequest(url) {
 
 function selectInterfaceTheme(theme) {
     let cssRoot = document.querySelector(":root")
-    if (theme === "dark_theme") {
+    if (theme === "dark") {
         cssRoot.style.setProperty("--theme-color", "#282833")
         cssRoot.style.setProperty("--accent-color", "#020211")
         cssRoot.style.setProperty("--default-text-color", "#e3e3e3")
         cssRoot.style.setProperty("--accent-text-color", "white")
         cssRoot.style.setProperty("--shadows-color", "dimgray")
         cssRoot.style.setProperty("--buttons-color", "#e3e3e3")
+        cssRoot.style.setProperty("--hover-buttons-color", "#a4a0ff")
         cssRoot.style.setProperty("--disabled-buttons-color", "gray")
 
         return
@@ -162,19 +179,10 @@ function selectInterfaceTheme(theme) {
     cssRoot.style.setProperty("--accent-text-color", "dimgray")
     cssRoot.style.setProperty("--shadows-color", "#c2c2c2")
     cssRoot.style.setProperty("--buttons-color", "dimgray")
+    cssRoot.style.setProperty("--hover-buttons-color", "#a4a0ff")
     cssRoot.style.setProperty("--disabled-buttons-color", "gray")
-
-
 }
 
-document.querySelector("#change_theme").addEventListener("click", () => {
-    if (interfaceTheme == "dark_theme") {
-        interfaceTheme = "light_theme"
-    } else {
-        interfaceTheme = "dark_theme"
-    }
-
-    localStorage.setItem("user_theme", interfaceTheme)
-
-    selectInterfaceTheme(interfaceTheme)
-})
+function openChangeLog() {
+    ipcRenderer.send("open-changelog", localStorage.getItem("user_theme"))
+}

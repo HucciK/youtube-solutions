@@ -51,8 +51,11 @@ func (c *Client) CheckCookies(cookies []*http.Cookie, cookieGeo, cookiesPath, co
 
 	data, err := c.startAuthProcess(cookies)
 	if err != nil {
-		upd := models.Update{Type: models.ErrorNotifyType, Err: err}
-		updatesChan <- upd
+		if err.Error() != "sapisid not found" {
+			checkControl.Errors++
+			upd := models.Update{Type: models.ErrorNotifyType, Data: *checkControl, Err: err}
+			updatesChan <- upd
+		}
 		return
 	}
 
@@ -95,8 +98,11 @@ func (c *Client) CheckCookies(cookies []*http.Cookie, cookieGeo, cookiesPath, co
 			}
 			channels++
 
-			data, err := c.channelInformation(channelId)
+			data, err = c.channelInformation(channelId)
 			if err != nil {
+				checkControl.Errors++
+				upd := models.Update{Type: models.ErrorNotifyType, Data: *checkControl, Err: err}
+				updatesChan <- upd
 				continue
 			}
 

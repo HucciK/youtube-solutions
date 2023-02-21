@@ -128,7 +128,7 @@
 
 #proxy_speed_test:hover{
     cursor: pointer;
-    fill: var(--theme-color);
+    fill: var(--hover-buttons-color);
 }
 
 #add_proxy {

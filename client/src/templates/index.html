@@ -125,7 +125,10 @@
               <div class="content_body">
                 <div id="license_info_type" class="license_info_data"></div>
                 <div id="license_info_expire" class="license_info_data"></div>
-                <div id="license_info_news" class="license_info_data"></div>
+                <div id="license_info_news" class="license_info_data">
+                    <div id="license_version_info"></div>
+                    <button id="open_change_log">CHANGE LOG</button>
+                </div>
                 <div id="license_info_owner" class="license_info_data">
                   <img id="owner_avatar" src="" alt="">
                   <div id="owner_name"></div>
@@ -151,6 +154,7 @@
               </div>
 
               <div id="checker_result_info_title">
+                <div class="section_title">$</div>
                 <div class="section_title">
                   <div class="section_title_text">Subs</div>
                   <svg class="section_title_sort" id="subs_sort">
@@ -164,9 +168,14 @@
                     <use xlink:href="#arrow"></use>
                   </svg>
                 </div>
-
                 <div class="section_title">Year</div>
-                <div class="section_title">Geo</div>
+                <div class="section_title">Brand</div>
+                <div class="section_title">
+                  <div class="section_title_text">Geo</div>
+                  <svg class="section_title_sort" id="geo_sort">
+                    <use xlink:href="#arrow"></use>
+                  </svg>
+                </div>
                 <div class="section_title">Link</div>
               </div>
 
@@ -222,7 +231,7 @@
                   </div>
 
                   <div id="visual_settings" class="container_settings_list">
-                    <button id="change_theme">сменить тему</button>
+                    <button id="change_theme">Switch<br>theme</button>
                   </div>
                 </div>
 

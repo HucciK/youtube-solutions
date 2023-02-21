@@ -32,7 +32,7 @@
 }
 
 .settings_path_select_button:hover{
-    color: var(--theme-color);
+    color: var(--hover-buttons-color);
     cursor: pointer;
 }
 
@@ -67,4 +67,12 @@
 
 .container_settings_list:first-of-type {
     margin-bottom: 25px;
+}
+
+#change_theme {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--accent-text-color);
+    cursor: pointer;
 }

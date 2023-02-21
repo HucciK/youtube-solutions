@@ -38,6 +38,10 @@ func (h Handler) InitRoutes() http.Handler {
 
 	mux.HandleFunc("/clientUpdate/", h.ClientUpdate)
 	mux.HandleFunc("/devUpdate/", h.DevUpdate)
+	mux.HandleFunc("/api/changeLog", h.GetChangeLog)
+
+	mux.HandleFunc("/css/", h.GetCSS)
+	mux.HandleFunc("/scripts/", h.GetJS)
 
 	return mux
 }

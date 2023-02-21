@@ -168,6 +168,28 @@ ipcMain.on("check-updates", async () => {
   })
 })
 
+ipcMain.on("open-changelog", (e, data) => {
+  const childWindow = new BrowserWindow({
+    width: 440,
+    height: 560,
+    icon: __dirname + "/static/yt.ico",
+    title: "changelog",
+    parent: getMainWindow(),
+    //frame: false,
+    //transparent:true,
+    //resizable: false,
+    webPreferences: {
+      contextIsolation: false,
+      nodeIntegration: true,
+    },
+  })
+  //childWindow.removeMenu()
+
+  //childWindow.loadFile(__dirname + "/templates/changeLog.html")
+  childWindow.loadURL("http://localhost:8080/api/changeLog?theme=" + data)
+  remoteMain.enable(childWindow.webContents);
+})
+
 ipcMain.on("exit-signal", () => {
   try {
     process.kill(local)

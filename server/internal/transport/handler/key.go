@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"yt-solutions-server/internal/core"
 )
@@ -103,46 +102,4 @@ func (h Handler) UnbindAddress(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-}
-
-func (h Handler) ClientUpdate(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path[len("/clientUpdate/"):]
-
-	if path == "RELEASES" {
-		releases, err := os.ReadFile("../resources/RELEASES")
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		w.Write(releases)
-		return
-	}
-
-	update, err := os.ReadFile(fmt.Sprintf("../resources/%s", path))
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	w.Write(update)
-}
-
-func (h Handler) DevUpdate(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path[len("/devUpdate/"):]
-
-	if path == "RELEASES" {
-		releases, err := os.ReadFile("../dev_resources/RELEASES")
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		w.Write(releases)
-		return
-	}
-
-	update, err := os.ReadFile(fmt.Sprintf("../dev_resources/%s", path))
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	w.Write(update)
 }

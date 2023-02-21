@@ -5,14 +5,10 @@
 
 dark theme
 :root{
-"--theme-color", "#282833"
-"--accent-color", "#020211"
-"--default-text-color", "#e3e3e3"
-"--accent-text-color", "white"
-"--shadows-color", "dimgray"
-"--buttons-color", "#e3e3e3"
-"--disabled-buttons-color", "gray"
---hover-buttons-color: #a4a0ff;
+--theme-color: #282833;
+--accent-color: #32323f;
+--shadows-color: #3d3d4b;
+--default-color: white;
 }
 
 
@@ -27,8 +23,6 @@ light theme
   --shadows-color: #c2c2c2;
 
   --buttons-color: dimgray;
-  --hover-buttons-color: #a4a0ff;
-  --disabled-buttons-color: gray;
 }
 
 */
@@ -44,7 +38,6 @@ light theme
   --shadows-color: #c2c2c2;
 
   --buttons-color: dimgray;
-  --hover-buttons-color: #a4a0ff;
   --disabled-buttons-color: gray;
 }
 

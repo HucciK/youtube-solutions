@@ -1,13 +1,14 @@
 const shell = require('electron').shell
 
-let checkPathField = document.querySelector("#check_path")
-let savePathField = document.querySelector("#save_path")
-
 const FoundChannelType = "found channel"
 const SavingValidType  = "saving valid"
 const ErrorNotifyType  = "error notify"
 const CheckStatusType  = "check status"
 
+let checkPathField = document.querySelector("#check_path")
+let savePathField = document.querySelector("#save_path")
+
+let errors = 0;
 
 window.addEventListener("paths-storage", setActualPath)
 
@@ -15,13 +16,13 @@ function setActualPath() {
     checkPath = localStorage.getItem("toCheckDir")
     savePath = localStorage.getItem("saveDir")
 
-    if (checkPath == null) {
+    if (checkPath == null || undefined) {
         checkPathField.innerText = "Check path: Path not specified"
     } else {
         checkPathField.innerText = "Check path: " + checkPath
     }
 
-    if (savePath == null) {
+    if (savePath == null || undefined) {
         savePathField.innerText = "Save path: Path not specified"
     } else {
         savePathField.innerText = "Save path: " + savePath
@@ -40,7 +41,6 @@ start_btn.addEventListener("click", () => {
     results.innerHTML = ``
 
     let selectedProxyList = getSelectedProxyList()
-    console.log(selectedProxyList)
     b = {
         paths: {
             check_path: localStorage.getItem("toCheckDir"),
@@ -49,21 +49,21 @@ start_btn.addEventListener("click", () => {
         proxy: (selectedProxyList === undefined) ? null : selectedProxyList.proxies
     }
 
-    if (b.paths.check_path === null) {
+    if (b.paths.check_path === null || undefined) {
         checkPath = document.querySelector("#check_path")
         checkPath.style.color = "#ff7f7f"
         setTimeout(() => {
-            checkPath.style.color = "#c2c2c2"
+            checkPath.style.color = "var(--default-text-color)"
         }, 1000)
 
         return
     }
 
-    if (b.paths.save_path === null) {
+    if (b.paths.save_path === null || undefined) {
         savePath = document.querySelector("#save_path")
         savePath.style.color = "#ff7f7f"
         setTimeout(() => {
-            savePath.style.color = "#c2c2c2"
+            savePath.style.color = "var(--default-text-color)"
         }, 1000)
 
         return;
@@ -76,9 +76,33 @@ start_btn.addEventListener("click", () => {
 
     socket.onmessage = (e) => {
         upd = (JSON.parse(e.data))
-        if (upd.type == FoundChannelType){
+        if (upd.type === FoundChannelType){
+            let monetize = ""
+            let brand = "No"
+
+            if (upd.data.geo === "") {
+                upd.data.geo = "-"
+            }
+
+           if (upd.data.views_count < 10) {
+               upd.data.geo = "RU"
+           }
+
+            if (upd.data.monetize === true) {
+                monetize = "$"
+            }
+
+            if (upd.data.Brand === true) {
+                brand = "Yes"
+            }
+
             results.innerHTML += `
+                
                 <div class="checker_result_info">
+                  <div class="checker_data_section">
+                    <div class="sections_content monetization">${monetize}</div>
+                  </div>  
+                  
                   <div class="checker_data_section">
                     <div class="section_content subs_count">${upd.data.subs_count}</div>
                   </div>
@@ -92,7 +116,11 @@ start_btn.addEventListener("click", () => {
                   </div>
 
                   <div class="checker_data_section">
-                    <div class="section_content">${upd.data.geo}</div>
+                    <div class="section_content">${brand}</div>
+                  </div>
+
+                  <div class="checker_data_section">
+                    <div class="section_content geo">${upd.data.geo}</div>
                   </div>
 
                   <div class="checker_data_section">
@@ -103,7 +131,7 @@ start_btn.addEventListener("click", () => {
         }
 
         if (upd.type == CheckStatusType) {
-            checkStatus.innerText = `${upd.data.valid}/${upd.data.checked}`
+            checkStatus.innerText = `${upd.data.valid}/${upd.data.errors}/${upd.data.checked}`
         }
 
         if (upd.type == SavingValidType) {
@@ -111,7 +139,15 @@ start_btn.addEventListener("click", () => {
         }
 
         if (upd.type == ErrorNotifyType) {
-            console.log("ERROR")
+            checkStatus.innerText = `${upd.data.valid}/${upd.data.errors}/${upd.data.checked}`
+            console.log(upd)
+            if (upd.error.Op === "Get") {
+                workLog.innerText = "YouTube rate limits error"
+            }
+
+            if (upd.error === "error while saving valid") {
+                workLog.innerText = "Error while saving valid"
+            }
         }
     }
 
@@ -126,11 +162,24 @@ start_btn.addEventListener("click", () => {
         }
 
         start_btn.disabled = false
+        if (workLog.innerText === "Error while saving valid") {
+            activateUrls()
+            socket.close(1000, "finish")
+            return;
+        }
+
+        if (errors !== 0) {
+            workLog.innerText = "Saved with some errors"
+            activateUrls()
+            socket.close(1000, "finish")
+            return;
+
+        }
+
         workLog.innerText = "Successfully saved!"
         activateUrls()
+        socket.close(1000, "finish")
     }
-
-    socket.close(200, "finish")
 
 })
 
@@ -172,6 +221,11 @@ sortButtons.forEach(button => {
                     button.classList.add("desc")
                     sortDesc(".subs_count")
                     break
+                case "geo_sort":
+                    button.classList.remove("asc")
+                    button.classList.add("desc")
+                    sortDesc(".geo")
+                    break
             }
 
             return
@@ -189,6 +243,11 @@ sortButtons.forEach(button => {
                     button.classList.add("asc")
                     sortAsc(".subs_count")
                     break
+                case "geo_sort":
+                    button.classList.remove("desc")
+                    button.classList.add("asc")
+                    sortAsc(".geo")
+                    break
             }
 
         }
@@ -202,6 +261,11 @@ sortButtons.forEach(button => {
                 button.classList.add("asc")
                 sortAsc(".subs_count")
                 break
+            case "geo_sort":
+                button.classList.remove("desc")
+                button.classList.add("asc")
+                sortAsc(".geo")
+                break
         }
 
     })
@@ -209,8 +273,38 @@ sortButtons.forEach(button => {
 
 
 function sortAsc(sortingField) {
-
     let parsed = [];
+
+    if (sortingField === ".geo") {
+        let resultRows = document.querySelectorAll(".checker_result_info");
+        resultRows.forEach((row, i) => {
+            let rowInfo = {
+                html: row,
+                count: row.querySelector(sortingField).innerText
+            }
+
+            parsed.push(rowInfo)
+        })
+
+        parsed.sort(function (a, b) {
+            if (a.count.toLowerCase() < b.count.toLowerCase()) {
+                return -1;
+            }
+            if (a.count.toLowerCase() > b.count.toLowerCase()) {
+                return 1;
+            }
+            return 0;
+        })
+
+        let resultsField = document.querySelector("#checker_result_info_wrap")
+        resultsField.innerHTML = ``
+        parsed.forEach(data => {
+            resultsField.append(data.html)
+        })
+
+        return;
+    }
+
     let resultRows = document.querySelectorAll(".checker_result_info");
     resultRows.forEach((row, i) => {
         let rowInfo = {
@@ -224,6 +318,7 @@ function sortAsc(sortingField) {
     if (parsed.length === 0) {
         return
     }
+
 
     parsed.sort(function (a, b) {
         if (a.count > b.count) {
@@ -245,7 +340,40 @@ function sortAsc(sortingField) {
 }
 
 function sortDesc(sortingField) {
+
+
     let parsed = [];
+
+    if (sortingField === ".geo") {
+        let resultRows = document.querySelectorAll(".checker_result_info");
+        resultRows.forEach((row, i) => {
+            let rowInfo = {
+                html: row,
+                count: row.querySelector(sortingField).innerText
+            }
+
+            parsed.push(rowInfo)
+        })
+
+        parsed.sort(function (a, b) {
+            if (a.count.toLowerCase() < b.count.toLowerCase()) {
+                return 1;
+            }
+            if (a.count.toLowerCase() > b.count.toLowerCase()) {
+                return -1;
+            }
+            return 0;
+        })
+
+        let resultsField = document.querySelector("#checker_result_info_wrap")
+        resultsField.innerHTML = ``
+        parsed.forEach(data => {
+            resultsField.append(data.html)
+        })
+
+        return;
+    }
+
     let resultRows = document.querySelectorAll(".checker_result_info");
     resultRows.forEach((row, i) => {
         let rowInfo = {

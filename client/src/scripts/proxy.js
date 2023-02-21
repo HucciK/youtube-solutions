@@ -125,9 +125,10 @@ function updateLists() {
                return
            }
            disableProxyList()
-            currentContentList.classList.toggle("selected")
+           currentContentList.classList.toggle("selected")
            selectedProxyList.innerText = `Proxy ${currentContentList.querySelector(".proxy_title").innerText}`
        })
+
 
        let currentProxyList = document.querySelectorAll(".proxy_list")[document.querySelectorAll(".proxy_list").length-1]
        list.proxies.forEach(proxyString => {

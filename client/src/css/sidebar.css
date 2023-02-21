@@ -46,11 +46,11 @@ use {
 }
 
 .sidebar_btn:hover{
-    fill: var(--theme-color);
+    fill: var(--hover-buttons-color);
 }
 
 .sidebar_active {
-    fill: var(--theme-color);
+    fill: var(--hover-buttons-color);
 }
 
 #update {
@@ -58,7 +58,7 @@ use {
 }
 
 #update:hover{
-    fill: var(--theme-color);
+    fill: var(--hover-buttons-color);
     animation: update .7s linear;
 }
 

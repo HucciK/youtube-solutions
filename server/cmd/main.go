@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"yt-solutions-server/config"
 	"yt-solutions-server/internal/repository"
 	"yt-solutions-server/internal/services"
@@ -16,10 +17,12 @@ func main() {
 		panic(err)
 	}
 
-	db, err := repository.NewPostgres(cfg.DBСonfig)
-	if err != nil {
-		panic(err)
-	}
+	//db, err := repository.NewPostgres(cfg.DBСonfig)
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	var db *sql.DB
 
 	urepo := repository.NewUserRepo(db)
 	krepo := repository.NewKeyRepo(db)

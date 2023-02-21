@@ -8,12 +8,18 @@ const (
 )
 
 type Update struct {
-	Type string      `json:"type"`
-	Data interface{} `json:"data"`
-	Err  error       `json:"error"`
+	Type    string      `json:"type"`
+	Data    interface{} `json:"data"`
+	Err     interface{} `json:"error"`
+	Channel *chan Update
 }
 
 type CheckedAmount struct {
 	Valid   int `json:"valid"`
+	Errors  int `json:"errors"`
 	Checked int `json:"checked"`
+}
+
+func (u *Update) Send() {
+	*u.Channel <- *u
 }

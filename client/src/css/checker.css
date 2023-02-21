@@ -35,7 +35,7 @@
     border-radius: 15px;
     box-shadow: 0px 0px 10px var(--shadows-color);
 
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 #checker_result_info_wrap::-webkit-scrollbar {
@@ -71,6 +71,10 @@
 
 }
 
+.section_title:first-of-type{
+    width: 20px;
+}
+
 .section_title_text{
 
 }
@@ -79,6 +83,7 @@
     width: 15px;
     height: 15px;
     cursor: pointer;
+    fill: var(--accent-text-color);
 }
 
 .desc {
@@ -105,6 +110,10 @@
     align-items: center;
 }
 
+.checker_data_section:first-of-type {
+    width: 20px;
+}
+
 .checker_data_section:nth-last-child(:last-child) {
     margin-right: 100px;
 }
@@ -124,9 +133,10 @@
     transition: .3s;
 }
 
+
 #checker_start_button:hover{
     cursor: pointer;
-    color: var(--theme-color);
+    color: var(--hover-buttons-color);
 }
 
 .channel-url {

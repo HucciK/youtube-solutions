@@ -46,19 +46,16 @@ func NewYouTubeChekcer() *YouTubeChecker {
 }
 
 func (yt *YouTubeChecker) CheckFolder(checkPath, savePath string, updatesChan chan models.Update, proxies []models.Proxy) {
-
 	var wg sync.WaitGroup
 
-	s := time.Now()
+	checkControl := &models.CheckedAmount{}
+	resultChan := make(chan *models.CookieInfo, 10)
 
 	checkContent, err := os.ReadDir(checkPath)
 	if err != nil {
 		upd := models.Update{Type: models.ErrorNotifyType, Err: err}
 		updatesChan <- upd
 	}
-
-	checkControl := &models.CheckedAmount{}
-	resultChan := make(chan *models.CookieInfo, 10)
 
 	wg.Add(1)
 	go func() {
@@ -96,8 +93,6 @@ func (yt *YouTubeChecker) CheckFolder(checkPath, savePath string, updatesChan ch
 
 				cookies, err := yt.cookiesFromTxt(txt)
 				if err != nil {
-					upd := models.Update{Type: models.ErrorNotifyType, Err: err}
-					updatesChan <- upd
 					continue
 				}
 
@@ -106,6 +101,7 @@ func (yt *YouTubeChecker) CheckFolder(checkPath, savePath string, updatesChan ch
 				}
 
 				if err := yt.setClient(proxies); err != nil {
+					fmt.Println(err)
 					upd := models.Update{Type: models.ErrorNotifyType, Err: err}
 					updatesChan <- upd
 				}
@@ -132,25 +128,24 @@ func (yt *YouTubeChecker) CheckFolder(checkPath, savePath string, updatesChan ch
 		yt.sortByPath(result)
 		yt.sortByTxt(result)
 	}
-
 	wg.Wait()
-	fmt.Println(time.Now().Sub(s))
 
 	upd := models.Update{Type: models.SavingValidType, Data: "Saving valid"}
 	updatesChan <- upd
 	defer yt.clearCheckHistory()
 
 	if err := os.MkdirAll(path.Join(savePath, allCookiesFolderName), os.ModePerm); err != nil {
-		//
+		upd := models.Update{Type: models.ErrorNotifyType, Data: *checkControl, Err: SaveError}
+		updatesChan <- upd
 	}
 
 	//TODO горутины
 
 	if err := yt.saveValidLogs(checkPath, savePath); err != nil {
-		upd := models.Update{Type: models.ErrorNotifyType, Err: SaveError}
+		checkControl.Errors++
+		upd := models.Update{Type: models.ErrorNotifyType, Data: *checkControl, Err: SaveError}
 		updatesChan <- upd
 	}
-	fmt.Printf("FINISHED %d/%d FOR %v\n", checkControl.Valid, checkControl.Checked, time.Now().Sub(s))
 	close(updatesChan)
 }
 

@@ -21,6 +21,14 @@
     position: relative;
 }
 
+#open_change_log {
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 9px;
+    cursor: pointer;
+}
+
 #owner_avatar {
     width: 150px;
     height: 150px;
