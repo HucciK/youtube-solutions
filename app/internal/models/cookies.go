@@ -8,8 +8,9 @@ type CookieInfo struct {
 	VideosCount int    `json:"videos_count"`
 	Geo         string `json:"geo"`
 	Monetize    bool   `json:"monetize"`
-	Brand       bool
+	Brand       bool   `json:"brand"`
 	RegDate     string `json:"reg_date"`
+	Verified    bool   `json:"verified"`
 	Received    string
 	Path        string
 	TxtPath     string

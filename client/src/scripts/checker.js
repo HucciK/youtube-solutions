@@ -77,23 +77,27 @@ start_btn.addEventListener("click", () => {
     socket.onmessage = (e) => {
         upd = (JSON.parse(e.data))
         if (upd.type === FoundChannelType){
-            let monetize = ""
+            let monetize = "-"
             let brand = "No"
+            let verified = "-"
 
             if (upd.data.geo === "") {
                 upd.data.geo = "-"
             }
 
-           if (upd.data.views_count < 10) {
-               upd.data.geo = "RU"
-           }
-
             if (upd.data.monetize === true) {
                 monetize = "$"
             }
 
-            if (upd.data.Brand === true) {
+            if (upd.data.brand === true) {
                 brand = "Yes"
+            }
+
+            if (upd.data.verified === true) {
+                verified = `
+                    <svg id="verified">
+                        <use xlink:href="#verified_icon"></use>
+                    </svg>`
             }
 
             results.innerHTML += `
@@ -102,6 +106,10 @@ start_btn.addEventListener("click", () => {
                   <div class="checker_data_section">
                     <div class="sections_content monetization">${monetize}</div>
                   </div>  
+                  
+                  <div class="checker_data_section">
+                    <div class="section_content">${verified}</div>
+                  </div> 
                   
                   <div class="checker_data_section">
                     <div class="section_content subs_count">${upd.data.subs_count}</div>
@@ -117,7 +125,7 @@ start_btn.addEventListener("click", () => {
 
                   <div class="checker_data_section">
                     <div class="section_content">${brand}</div>
-                  </div>
+                  </div> 
 
                   <div class="checker_data_section">
                     <div class="section_content geo">${upd.data.geo}</div>

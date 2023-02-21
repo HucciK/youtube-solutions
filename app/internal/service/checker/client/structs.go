@@ -320,8 +320,9 @@ type YoutubeAccountData struct {
 // ChannelInfo Response
 
 type YoutubeChannelData struct {
-	Contents Contents `json:"contents"`
-	Header   Header   `json:"header"`
+	Contents        Contents        `json:"contents"`
+	Header          Header          `json:"header"`
+	ResponseContext ResponseContext `json:"responseContext"`
 }
 
 type Contents struct {
@@ -384,8 +385,17 @@ type Header struct {
 
 type C4TabbedHeaderRenderer struct {
 	Title               string              `json:"title"`
+	Badges              []Badges            `json:"badges"`
 	SubscriberCountText SubscriberCountText `json:"subscriberCountText"`
 	VideosCountText     VideosCountText     `json:"videosCountText"`
+}
+
+type Badges struct {
+	MetaDataBadgeRenderer MetaDataBadgeRenderer `json:"metadataBadgeRenderer"`
+}
+
+type MetaDataBadgeRenderer struct {
+	Style string `json:"style"`
 }
 
 type SubscriberCountText struct {
@@ -408,7 +418,7 @@ type DateRun struct {
 	Text string `json:"text"`
 }
 
-/////////////////////// API ////////////////////////
+// ///////////////////// API ////////////////////////
 type YoutubeAPIChannelData struct {
 	Items []ApiItem `json:"items"`
 }
@@ -427,4 +437,18 @@ type Statistics struct {
 	ViewCount   string `json:"viewCount"`
 	Subscribers string `json:"subscriberCount"`
 	VideoCount  string `json:"videoCount"`
+}
+
+type ResponseContext struct {
+	ServiceTrackingParams []ServiceTrackingParams `json:"serviceTrackingParams"`
+}
+
+type ServiceTrackingParams struct {
+	Service        string           `json:"service"`
+	TrackingParams []TrackingParams `json:"trackingParams"`
+}
+
+type TrackingParams struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }

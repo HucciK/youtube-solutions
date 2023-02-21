@@ -80,6 +80,11 @@
         </g>>
       </symbol>
 
+      <symbol id="verified_icon" viewBox="0 0 20 20">
+        <g>
+          <path d="M0 11l2-2 5 5 11-11 2 2-13 13z"></path>
+        </g>
+      </symbol>
     </svg>
 
     <div id="app">
@@ -147,7 +152,7 @@
                   <div class="paths_info" id="save_path">Save path:</div>
                 </div>
                 <div id="checker_worklog">
-                  <div class="checker_state" id="checker_result">0/0</div>
+                  <div class="checker_state" id="checker_result">0/0/0</div>
                   <div class="checker_state" id="checker_status">Waiting</div>
                   <div class="checker_state" id="checker_proxy_list">Proxy not selected</div>
                 </div>
@@ -155,6 +160,11 @@
 
               <div id="checker_result_info_title">
                 <div class="section_title">$</div>
+                <div class="section_title">
+                  <svg id="verified_title">
+                    <use xlink:href="#verified_icon"></use>
+                  </svg>
+                </div>
                 <div class="section_title">
                   <div class="section_title_text">Subs</div>
                   <svg class="section_title_sort" id="subs_sort">

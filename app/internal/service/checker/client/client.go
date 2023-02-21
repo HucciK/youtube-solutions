@@ -121,11 +121,12 @@ func (c *Client) CheckCookies(cookies []*http.Cookie, cookieGeo, cookiesPath, co
 
 			info := &models.CookieInfo{}
 			info.ID = channelId
-			info.Monetize = false
+			info.Monetize, _ = c.isMonetized(channelInfo.ResponseContext.ServiceTrackingParams)
 			info.ViewsCount, _ = c.parseViews(channelInfo.Contents.TwoColumnBrowseResultsRenderer.Tabs[len(channelInfo.Contents.TwoColumnBrowseResultsRenderer.Tabs)-index].TabRenderer.RendererContent.SectionListRenderer.ListRendererContents[0].ItemSectionRenderer.SectionContents[0].ChannelAboutFullMetadataRenderer.ViewCountText.SimpleText)
 			info.Subscribes, _ = c.convertSubs(channelInfo.Header.C4TabbedHeaderRenderer.SubscriberCountText.SimpleText)
 			//info.Channels = len(account.Data.Actions[0].GetMultiPageMenuAction.Menu.MultiPageMenuRenderer.Sections)
 			info.VideosCount, _ = strconv.Atoi(channelInfo.Header.C4TabbedHeaderRenderer.VideosCountText.Runs[0].Text)
+			info.Verified = c.isVerified(channelInfo.Header.C4TabbedHeaderRenderer.Badges)
 			info.RegDate = channelInfo.Contents.TwoColumnBrowseResultsRenderer.Tabs[len(channelInfo.Contents.TwoColumnBrowseResultsRenderer.Tabs)-index].TabRenderer.RendererContent.SectionListRenderer.ListRendererContents[0].ItemSectionRenderer.SectionContents[0].ChannelAboutFullMetadataRenderer.JoinedDateText.Runs[1].Text
 			info.Geo = cookieGeo
 			info.Path = cookiesPath
@@ -360,6 +361,40 @@ func (c *Client) parseViews(input string) (int, error) {
 	viewsStr := strings.Split(input, " ")[0]
 
 	return strconv.Atoi(strings.ReplaceAll(viewsStr, ",", ""))
+}
+
+func (c *Client) isMonetized(services []ServiceTrackingParams) (bool, error) {
+	if len(services) == 0 {
+		return false, nil
+	}
+
+	for _, service := range services {
+		if service.Service == "GFEEDBACK" {
+			if len(service.TrackingParams) == 0 {
+				return false, nil
+			}
+
+			for _, param := range service.TrackingParams {
+				if param.Key == "is_monetization_enabled" {
+					return strconv.ParseBool(param.Value)
+				}
+			}
+		}
+	}
+
+	return false, nil
+}
+
+func (c *Client) isVerified(badges []Badges) bool {
+	if len(badges) == 0 {
+		return false
+	}
+
+	if badges[0].MetaDataBadgeRenderer.Style == "BADGE_STYLE_TYPE_VERIFIED" {
+		return true
+	}
+
+	return false
 }
 
 func (c *Client) setCookieJar() error {
